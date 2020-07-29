@@ -16,7 +16,33 @@
             <span class="subheader">Put your code here:</span>
             <form id="main-form" class="mt-2">
                 <div>
-                    <textarea id="code-example" class="d-none">public class Test {public static void main(String[] args) throws Exception {System.out.println("Hello world!");} }</textarea>
+                    <textarea id="code-example" class="d-none">import java.util.Scanner;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        final var scanner = new Scanner(System.in);
+        final var a = scanner.nextInt();
+        final var b = scanner.nextInt();
+        final var operation = scanner.next();
+        scanner.close();
+        switch(operation) {
+            case "+":
+                System.out.print("Sum result is: " + (a + b));
+                break;
+            case "-":
+                System.out.print("Minus result is: " + (a - b));
+                break;
+            case "*":
+                System.out.print("Multiplication result is: " + (a * b));
+                break;
+            case "/":
+                System.out.print("Division result is: " + (a / (float) b));
+                break;
+            default:
+                System.out.print("Wrong operation!");
+        }
+    }
+}</textarea>
                     <div id="editor"></div>
                     <input id="code" type="text" name="code" style="display: none;">
                 </div>

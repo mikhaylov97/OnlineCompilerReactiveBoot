@@ -8,41 +8,18 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.io.File.separator;
+import static java.util.Collections.emptyList;
+import static org.apache.commons.io.FileUtils.getTempDirectoryPath;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static reactor.core.publisher.Mono.just;
 
 @Service
 public class CompileService {
 
     /**
-     * Name of the folder where classes will be created
-     */
-    private static final String CLASSES = "classes";
-
-    /**
-     * Property of the system which helps us to find tomcat root folder
-     */
-    private static final String TOMCAT_HOME_PROPERTY = "catalina.home";
-
-    /**
-     * Absolute path to the tomcat root folder
-     */
-    private static final String TOMCAT_HOME_PATH = System.getProperty(TOMCAT_HOME_PROPERTY);
-
-    /**
-     * Path to the classes folder inside the tomcat root catalog
-     */
-    private static final String CLASSES_PATH = TOMCAT_HOME_PATH + separator + CLASSES;
-
-    /**
-     * Field which stores Java API of images folder
-     */
-    private static final File CLASSES_DIR = new File(CLASSES_PATH);
-
-    /**
      * Absolute path to the images folder inside the tomcat root catalog
      */
-    private static final String CLASSES_DIR_ABSOLUTE_PATH = CLASSES_DIR.getAbsolutePath() + separator;
+    private static final String CLASSES_DIR_ABSOLUTE_PATH = getTempDirectoryPath();
 
     private static final String JAVAC_COMMAND = "javac";
     private static final String JAVA_COMMAND = "java";
@@ -52,21 +29,21 @@ public class CompileService {
     private static final String ADDITIONAL_COMMAND = "-cp";
     private static final String SPACE = " ";
 
+    private static final String JAVA_FILE_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, JAVA_EXTENSION);
+    private static final String JAVA_CLASS_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, CLASS_EXTENSION);
+
     private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + JAVA_EXTENSION;
     private static final String JAVA_RUN_COMMAND = JAVA_COMMAND + SPACE + ADDITIONAL_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SPACE + CLASS_NAME;
 
     public Mono<String> compileCode(CompileData payload) {
         final var code = payload.getCode();
         final var inputParams = payload.getInputParams();
-        if (!CLASSES_DIR.exists()) {
-            CLASSES_DIR.mkdirs();
-        }
 
-        File javaFile = new File(CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + JAVA_EXTENSION);
+        final var javaFile = new File(JAVA_FILE_PATH);
         try(BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(javaFile))) {
             stream.write(code.getBytes());
-            stream.close();
         } catch (Exception e) {
+            clearDirectory();
             return just("Something was wrong during compiling code.");
         }
 
@@ -103,19 +80,20 @@ public class CompileService {
 
             return just(runResult);
         } catch (Exception e) {
+            clearDirectory();
             return just("Something was wrong during compiling code.");
         }
     }
 
     private List<String> prepareInputParameters(String inputParameters) {
-        return Arrays.asList(inputParameters.split(System.lineSeparator()));
+        return isNotBlank(inputParameters) ? Arrays.asList(inputParameters.split(System.lineSeparator())) : emptyList();
     }
 
     private void clearDirectory() {
-        File javaFile = new File(CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + JAVA_EXTENSION);
+        File javaFile = new File(JAVA_FILE_PATH);
         javaFile.delete();
 
-        File classFile = new File(CLASSES_DIR_ABSOLUTE_PATH + CLASS_NAME + CLASS_EXTENSION);
+        File classFile = new File(JAVA_CLASS_PATH);
         classFile.delete();
     }
 
