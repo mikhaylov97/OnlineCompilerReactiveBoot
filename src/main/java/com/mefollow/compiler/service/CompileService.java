@@ -63,11 +63,11 @@ public class CompileService {
             Process compileProcess = Runtime.getRuntime().exec(JAVAC_COMPILING_COMMAND);
             String compileErrors = printLines(compileProcess.getErrorStream());
             compileProcess.waitFor();
-//            if (!compileErrors.isEmpty()) {
-//                log.info("Compilation error is occurred - clearing folder.");
-//                clearDirectory();
-//                return just(compileErrors);
-//            }
+            if (!compileErrors.isEmpty()) {
+                log.info("Compilation error is occurred - clearing folder.");
+                clearDirectory();
+                return just(compileErrors);
+            }
 
             log.info("Java class file exists: " + new File(JAVA_CLASS_PATH).exists());
 
@@ -82,13 +82,13 @@ public class CompileService {
             outputStream.close();
 
             String runErrors = printLines(runProcess.getErrorStream());
-//            if (!runErrors.isEmpty()) {
-//                log.info("Execution error is occurred - clearing folder.");
-//                runProcess.waitFor();
-//                clearDirectory();
-//
-//                return just(runErrors);
-//            }
+            if (!runErrors.isEmpty()) {
+                log.info("Execution error is occurred - clearing folder.");
+                runProcess.waitFor();
+                clearDirectory();
+
+                return just(runErrors);
+            }
 
             String runResult = printLines(runProcess.getInputStream());
             log.info("Run result: " + runResult);
