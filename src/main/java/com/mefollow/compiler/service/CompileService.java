@@ -82,13 +82,13 @@ public class CompileService {
             outputStream.close();
 
             String runErrors = printLines(runProcess.getErrorStream());
-            if (!runErrors.isEmpty()) {
-                log.info("Execution error is occurred - clearing folder.");
-                runProcess.waitFor();
-                clearDirectory();
-
-                return just(runErrors);
-            }
+//            if (!runErrors.isEmpty()) {
+//                log.info("Execution error is occurred - clearing folder.");
+//                runProcess.waitFor();
+//                clearDirectory();
+//
+//                return just(runErrors);
+//            }
 
             String runResult = printLines(runProcess.getInputStream());
             log.info("Run result: " + runResult);
