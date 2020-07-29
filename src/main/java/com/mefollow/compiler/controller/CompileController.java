@@ -2,12 +2,12 @@ package com.mefollow.compiler.controller;
 
 import com.mefollow.compiler.domain.CompileData;
 import com.mefollow.compiler.service.CompileService;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Controller
 public class CompileController {
@@ -27,13 +27,6 @@ public class CompileController {
     public String getMainPage() {
         return "main";
     }
-
-//    @PostMapping("/compile")
-//    @ResponseBody
-//    public Mono<String> compileCodeAndGetResultPage(@RequestParam(name = "code") String code,
-//                                                    @RequestParam(name = "inputParams") String inputParams) {
-//        return compileService.compileCode(code, inputParams);
-//    }
 
     @PostMapping("/compile")
     @ResponseBody
