@@ -1,6 +1,8 @@
 package com.mefollow.compiler.service;
 
 import com.mefollow.compiler.domain.CompileData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -15,6 +17,8 @@ import static reactor.core.publisher.Mono.just;
 
 @Service
 public class CompileService {
+
+    private final Logger log = LoggerFactory.getLogger(CompileService.class);
 
     /**
      * Absolute path to the images folder inside the tomcat root catalog
@@ -40,13 +44,20 @@ public class CompileService {
         final var code = payload.getCode();
         final var inputParams = payload.getInputParams();
 
+        log.info("Javac command: " + JAVAC_COMPILING_COMMAND);
+        log.info("Java run command: " + JAVA_RUN_COMMAND);
+
         final var javaFile = new File(JAVA_FILE_PATH);
+        log.info("Java file path: " + JAVA_FILE_PATH);
+        log.info("Java file: " + javaFile.toString());
         try(BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(javaFile))) {
             stream.write(code.getBytes());
         } catch (Exception e) {
             clearDirectory();
             return just("Something was wrong during compiling code.");
         }
+
+        log.info("Java file exists: " + new File(JAVA_FILE_PATH).exists());
 
         try {
             Process compileProcess = Runtime.getRuntime().exec(JAVAC_COMPILING_COMMAND);
@@ -57,7 +68,10 @@ public class CompileService {
                 return just(compileErrors);
             }
 
+            log.info("Java class file exists: " + new File(JAVA_CLASS_PATH).exists());
+
             List<String> inputParameters = prepareInputParameters(inputParams);
+            log.info("Input params: " + inputParameters);
             Process runProcess = Runtime.getRuntime().exec(JAVA_RUN_COMMAND);
             OutputStream outputStream = runProcess.getOutputStream();
             for (String parameter : inputParameters) {
@@ -75,6 +89,7 @@ public class CompileService {
             }
 
             String runResult = printLines(runProcess.getInputStream());
+            log.info("Run result: " + runResult);
             runProcess.waitFor();
 
             clearDirectory();
