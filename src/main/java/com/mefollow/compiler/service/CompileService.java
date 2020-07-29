@@ -37,7 +37,7 @@ public class CompileService {
     private static final String JAVA_FILE_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, JAVA_EXTENSION);
     private static final String JAVA_CLASS_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, CLASS_EXTENSION);
 
-    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SLASH + CLASS_NAME + JAVA_EXTENSION;
+    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + "-verbose" + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SLASH + CLASS_NAME + JAVA_EXTENSION;
     private static final String JAVA_RUN_COMMAND = JAVA_COMMAND + SPACE + ADDITIONAL_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SPACE + CLASS_NAME;
 
     public Mono<String> compileCode(CompileData payload) {
