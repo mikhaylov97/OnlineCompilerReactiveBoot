@@ -37,7 +37,7 @@ public class CompileService {
     private static final String JAVA_FILE_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, JAVA_EXTENSION);
     private static final String JAVA_CLASS_PATH = String.format("%s/%s%s", getTempDirectoryPath(), CLASS_NAME, CLASS_EXTENSION);
 
-    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + "-verbose" + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SLASH + CLASS_NAME + JAVA_EXTENSION;
+    private static final String JAVAC_COMPILING_COMMAND = JAVAC_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SLASH + CLASS_NAME + JAVA_EXTENSION;
     private static final String JAVA_RUN_COMMAND = JAVA_COMMAND + SPACE + ADDITIONAL_COMMAND + SPACE + CLASSES_DIR_ABSOLUTE_PATH + SPACE + CLASS_NAME;
 
     public Mono<String> compileCode(CompileData payload) {
@@ -61,7 +61,7 @@ public class CompileService {
 
         try {
             Process compileProcess = Runtime.getRuntime().exec(JAVAC_COMPILING_COMMAND);
-            String compileErrors = printLines(compileProcess.getErrorStream());
+            String compileErrors = printLines(compileProcess.getErrorStream(), true);
             compileProcess.waitFor();
             if (!compileErrors.isEmpty()) {
                 log.info("Compilation error is occurred - clearing folder.");
@@ -81,7 +81,7 @@ public class CompileService {
             }
             outputStream.close();
 
-            String runErrors = printLines(runProcess.getErrorStream());
+            String runErrors = printLines(runProcess.getErrorStream(), true);
             if (!runErrors.isEmpty()) {
                 log.info("Execution error is occurred - clearing folder.");
                 runProcess.waitFor();
@@ -90,7 +90,7 @@ public class CompileService {
                 return just(runErrors);
             }
 
-            String runResult = printLines(runProcess.getInputStream());
+            String runResult = printLines(runProcess.getInputStream(), false);
             log.info("Run result: " + runResult);
             runProcess.waitFor();
 
@@ -115,11 +115,14 @@ public class CompileService {
         classFile.delete();
     }
 
-    private String printLines(InputStream inputStream) throws Exception {
+    private String printLines(InputStream inputStream, boolean forErrorStream) throws Exception {
         String line;
         StringBuilder result = new StringBuilder();
         BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
         while ((line = in.readLine()) != null) {
+            //The check below is necessary to filter out JAVA_TOOL_OPTIONS error, which is actually
+            //is not an error, but prevent code compilation and execution.
+            if (forErrorStream && line.matches("^Picked up JAVA_TOOL_OPTIONS:.*")) continue;
             result.append(line).append(System.lineSeparator());
         }
         in.close();
