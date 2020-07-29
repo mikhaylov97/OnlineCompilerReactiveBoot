@@ -64,6 +64,7 @@ public class CompileService {
             String compileErrors = printLines(compileProcess.getErrorStream());
             compileProcess.waitFor();
             if (!compileErrors.isEmpty()) {
+                log.info("Compilation error is occurred - clearing folder.");
                 clearDirectory();
                 return just(compileErrors);
             }
@@ -82,6 +83,7 @@ public class CompileService {
 
             String runErrors = printLines(runProcess.getErrorStream());
             if (!runErrors.isEmpty()) {
+                log.info("Execution error is occurred - clearing folder.");
                 runProcess.waitFor();
                 clearDirectory();
 
