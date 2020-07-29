@@ -1,0 +1,46 @@
+.code-area {
+    white-space: pre-wrap;
+}
+
+.header {
+    font-size: 30px;
+}
+
+.output-code {
+    height: 300px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    background-color: #272822;
+    line-height: 14px;
+    font-size: 14px;
+    color: white;
+    overflow-y: overlay;
+}
+
+.compiling-message {
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.output span, .subheader {
+    font-size: 22px;
+}
+#compile-output {
+    margin-top: 4px;
+}
+
+#editor {
+    position: relative;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 720px;
+    height: 300px;
+}
+
+.arrow {
+    font-weight: 500;
+    color: #e2391b;
+    font-size: 18px;
+}
